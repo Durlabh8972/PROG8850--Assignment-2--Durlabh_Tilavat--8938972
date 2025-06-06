@@ -1,0 +1,47 @@
+name: CI/CD MySQL Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install MySQL connector
+        run: pip install mysql-connector-python
+
+      - name: Run SQL Script
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          python3 -c "
+import mysql.connector
+conn = mysql.connector.connect(
+    host='${{ secrets.DB_HOST }}',
+    user='${{ secrets.DB_USER }}',
+    password='${{ secrets.DB_PASSWORD }}',
+    database='${{ secrets.DB_NAME }}'
+)
+cursor = conn.cursor()
+with open('add_departments.sql', 'r') as f:
+    sql = f.read().split(';')
+    for command in sql:
+        if command.strip():
+            cursor.execute(command)
+conn.commit()
+cursor.close()
+conn.close()
+"
