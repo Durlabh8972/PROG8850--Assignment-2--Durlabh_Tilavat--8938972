@@ -8,14 +8,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.x
+          python-version: '3.x'
 
       - name: Install MySQL connector
         run: pip install mysql-connector-python
@@ -30,10 +31,10 @@ jobs:
           python3 -c "
 import mysql.connector
 conn = mysql.connector.connect(
-    host='${{ secrets.DB_HOST }}',
-    user='${{ secrets.DB_USER }}',
-    password='${{ secrets.DB_PASSWORD }}',
-    database='${{ secrets.DB_NAME }}'
+  host='${{ secrets.DB_HOST }}',
+  user='${{ secrets.DB_USER }}',
+  password='${{ secrets.DB_PASSWORD }}',
+  database='${{ secrets.DB_NAME }}'
 )
 cursor = conn.cursor()
 with open('add_departments.sql', 'r') as f:
