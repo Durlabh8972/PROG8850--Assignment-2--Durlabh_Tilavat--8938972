@@ -28,14 +28,14 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
-          python3 <<EOF
+          echo "
 import mysql.connector
 
 conn = mysql.connector.connect(
-    host='${{ secrets.DB_HOST }}',
-    user='${{ secrets.DB_USER }}',
-    password='${{ secrets.DB_PASSWORD }}',
-    database='${{ secrets.DB_NAME }}'
+    host='${{ env.DB_HOST }}',
+    user='${{ env.DB_USER }}',
+    password='${{ env.DB_PASSWORD }}',
+    database='${{ env.DB_NAME }}'
 )
 
 cursor = conn.cursor()
@@ -47,4 +47,6 @@ with open('add_departments.sql', 'r') as f:
 conn.commit()
 cursor.close()
 conn.close()
-EOF
+" > script.py
+
+          python3 script.py
