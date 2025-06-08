@@ -1,32 +1,32 @@
+import sys
 import mysql.connector
 
-def execute_sql(file_path):
-    conn = None
-    cursor = None
-    try:
-        conn = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='',
-            database='companydb'
-        )
-        cursor = conn.cursor()
-        with open(file_path, 'r') as file:
-            sql_commands = file.read().split(';')
-            for command in sql_commands:
-                if command.strip():
-                    try:
-                        cursor.execute(command)
-                    except mysql.connector.Error as cmd_err:
-                        print(f"SQL Command Error: {cmd_err}")
-        conn.commit()
-        print("SQL executed successfully.")
-    except mysql.connector.Error as err:
-        print(f"Connection Error: {err}")
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+def main():
+    if len(sys.argv) != 6:
+        print("Usage: python execute_sql_script.py <sql_file> <host> <user> <password> <database>")
+        sys.exit(1)
 
-execute_sql('schema_update.sql')
+    sql_file, host, user, password, database = sys.argv[1:]
+
+    conn = mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database
+    )
+
+    cursor = conn.cursor()
+
+    with open(sql_file, 'r') as f:
+        sql = f.read().split(';')
+        for command in sql:
+            if command.strip():
+                cursor.execute(command)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("✅ SQL script executed successfully.")
+
+if __name__ == "__main__":
+    main()

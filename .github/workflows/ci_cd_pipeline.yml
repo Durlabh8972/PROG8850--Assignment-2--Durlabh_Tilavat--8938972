@@ -10,16 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install MySQL connector
-        run: pip install mysql-connector-python
+        run: |
+          python -m pip install --upgrade pip
+          pip install mysql-connector-python
 
       - name: Run SQL Script
         env:
@@ -28,23 +30,4 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
-          echo 'import mysql.connector
-
-conn = mysql.connector.connect(
-    host="${{ env.DB_HOST }}",
-    user="${{ env.DB_USER }}",
-    password="${{ env.DB_PASSWORD }}",
-    database="${{ env.DB_NAME }}"
-)
-
-cursor = conn.cursor()
-with open("add_departments.sql", "r") as f:
-    sql = f.read().split(";")
-    for command in sql:
-        if command.strip():
-            cursor.execute(command)
-conn.commit()
-cursor.close()
-conn.close()' > run_script.py
-
-          python3 run_script.py
+          python execute_sql_script.py add_departments.sql "$DB_HOST" "$DB_USER" "$DB_PASSWORD" "$DB_NAME"
