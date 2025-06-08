@@ -6,6 +6,3 @@ CREATE TABLE IF NOT EXISTS projects (
     end_date DATE
 );
 
--- Alter table to add budget
-ALTER TABLE projects
-ADD COLUMN budget DECIMAL(10, 2);
